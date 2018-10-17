@@ -10,6 +10,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+use App\Service\MakeJson;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Validator\Constraints\DateTime;
+
 /**
  * @Route("/photo")
  */
@@ -18,9 +23,9 @@ class PhotoController extends AbstractController
     /**
      * @Route("/", name="photo_index", methods="GET")
      */
-    public function index(PhotoRepository $photoRepository): Response
+    public function index(PhotoRepository $photoRepository, MakeJson $makeJson): Response
     {
-        return $this->render('photo/index.html.twig', ['photos' => $photoRepository->findAll()]);
+        return $makeJson->json($photoRepository->findAll());
     }
 
     /**
@@ -49,9 +54,9 @@ class PhotoController extends AbstractController
     /**
      * @Route("/{id}", name="photo_show", methods="GET")
      */
-    public function show(Photo $photo): Response
+    public function show(Photo $photo, MakeJson $makeJson): Response
     {
-        return $this->render('photo/show.html.twig', ['photo' => $photo]);
+        return $makeJson->json($photo);
     }
 
     /**
