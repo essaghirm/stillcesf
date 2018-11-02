@@ -2,30 +2,24 @@
 
 namespace App\Form;
 
-use App\Entity\Meeting;
+use App\Entity\Service;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class MeetingType extends AbstractType
+class ServiceType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('description')
-            ->add('confirmation')
-            ->add('lieu')
-            ->add('date')
-            ->add('project')
-            ->add('creator')
-            ->add('attachedTo')
+            ->add('name')
         ;
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => Meeting::class,
+            'data_class' => Service::class,
         ]);
     }
 }

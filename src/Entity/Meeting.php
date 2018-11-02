@@ -37,16 +37,22 @@ class Meeting
     private $date;
 
     /**
-     * @ORM\ManyToOne(targetEntity="project")
+     * @ORM\ManyToOne(targetEntity="Project")
      * @ORM\JoinColumn(name="project_id", referencedColumnName="id")
      */
     private $project;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="user")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
+        /**
+     * @ORM\ManyToOne(targetEntity="User")
+     * @ORM\JoinColumn(name="creator", referencedColumnName="id")
      */
-    private $user;
+    private $creator;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="User")
+     * @ORM\JoinColumn(name="attached_to", referencedColumnName="id")
+     */
+    private $attachedTo;
 
     public function getId(): ?int
     {
@@ -113,14 +119,26 @@ class Meeting
         return $this;
     }
 
-    public function getUser(): ?user
+    public function getCreator(): ?User
     {
-        return $this->user;
+        return $this->creator;
     }
 
-    public function setUser(?user $user): self
+    public function setCreator(?User $creator): self
     {
-        $this->user = $user;
+        $this->creator = $creator;
+
+        return $this;
+    }
+
+    public function getAttachedTo(): ?User
+    {
+        return $this->attachedTo;
+    }
+
+    public function setAttachedTo(?User $attachedTo): self
+    {
+        $this->attachedTo = $attachedTo;
 
         return $this;
     }

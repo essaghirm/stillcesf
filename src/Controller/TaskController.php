@@ -22,11 +22,12 @@ use Symfony\Component\Validator\Constraints\DateTime;
 class TaskController extends AbstractController
 {
     /**
-     * @Route("/", name="task_index", methods="GET")
+     * @Route("/{what}/{user}", name="task_index", methods="GET",
+     * defaults={"what": "all", "user": null})
      */
-    public function index(TaskRepository $taskRepository, MakeJson $makeJson): Response
+    public function index(TaskRepository $taskRepository, MakeJson $makeJson, $what, $user): Response
     {
-        return $makeJson->json($taskRepository->findAll(), array('project'));
+        return $makeJson->json($taskRepository->what($what, $user), array('project'));
     }
 
     /**
@@ -54,9 +55,7 @@ class TaskController extends AbstractController
         $em->persist($task);
         $em->flush();
 
-        return $this->forward('App\Controller\TaskController::show', array(
-            'id'  => $task->getId()
-        ));
+        return $this->forward('App\Controller\TaskController::index');
 
     }
 

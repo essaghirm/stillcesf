@@ -10,6 +10,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+use App\Service\MakeJson;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Validator\Constraints\DateTime;
+
 /**
  * @Route("/user")
  */
@@ -18,9 +23,9 @@ class UserController extends AbstractController
     /**
      * @Route("/", name="user_index", methods="GET")
      */
-    public function index(UserRepository $userRepository): Response
+    public function index(UserRepository $userRepository, MakeJson $makeJson): Response
     {
-        return $this->render('user/index.html.twig', ['users' => $userRepository->findAll()]);
+        return $makeJson->json($userRepository->findAll(), array('project'));
     }
 
     /**
@@ -49,9 +54,9 @@ class UserController extends AbstractController
     /**
      * @Route("/{id}", name="user_show", methods="GET")
      */
-    public function show(User $user): Response
+    public function show(User $user, MakeJson $makeJson): Response
     {
-        return $this->render('user/show.html.twig', ['user' => $user]);
+        return $makeJson->json($user, array('project'));
     }
 
     /**

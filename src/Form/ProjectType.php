@@ -14,11 +14,12 @@ class ProjectType extends AbstractType
         $builder
             ->add('client')
             ->add('region')
-            ->add('phases')
+            ->add('phase')
             ->add('statuts')
             ->add('progress')
             ->add('contract_file')
             ->add('user')
+            ->add('services')
         ;
     }
 

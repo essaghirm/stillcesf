@@ -47,4 +47,51 @@ class MeetingRepository extends ServiceEntityRepository
         ;
     }
     */
+
+
+    /**
+     * @return Task[] Returns an array of Task objects
+     */
+    public function what($what, $user = null){
+
+        $em = $this->getEntityManager();
+
+        
+        switch ($what) {
+            case 'attachedToMe':
+                return $this->createQueryBuilder('m')
+                    ->andWhere('m.attachedTo = :val')
+                    ->setParameter('val', $user)
+                    ->orderBy('m.date', 'ASC')
+                    ->getQuery()
+                    ->getResult();
+                break;
+                
+            case 'related':
+                $projects = $em->createQueryBuilder()->select('p')
+                    ->from('App\Entity\Project', 'p')
+                    ->where('p.user = :val')
+                    ->setParameter('val', $user)
+                    ->getQuery()
+                    ->getResult();
+
+                // dump($projects);die;
+                return  $this->createQueryBuilder('m')
+                    ->andWhere('m.project in (:val)')
+                    ->setParameter('val', $projects)
+                    ->orderBy('m.date', 'ASC')
+                    ->getQuery()
+                    ->getResult();
+                // dump($tasks);die;
+            break;
+            
+            default:
+                return  $this->createQueryBuilder('m')
+                    ->orderBy('m.date', 'DESC')
+                    ->getQuery()
+                    ->getResult();
+                break;
+        }
+
+    }
 }

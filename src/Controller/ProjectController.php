@@ -29,26 +29,31 @@ class ProjectController extends AbstractController
     }
 
     /**
-     * @Route("/new", name="project_new", methods="GET|POST")
+     * @Route("/", name="project_new", methods="POST")
      */
-    public function new(Request $request): Response
+    public function new(Request $request, ValidatorInterface $validator, MakeJson $makeJson): Response
     {
+        $body = json_decode($request->getContent(), true); 
+        $body['services'] = json_encode($body['services']);
+
         $project = new Project();
         $form = $this->createForm(ProjectType::class, $project);
-        $form->handleRequest($request);
+        $form->submit($body);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($project);
-            $em->flush();
+        // dump($project);die;
 
-            return $this->redirectToRoute('project_index');
+        $errors = $validator->validate($project);
+        if (count($errors) > 0) {
+            return $makeJson->json($errors);
+            $errorsString = (string) $errors;
+            // return new JsonResponse($errors);
         }
 
-        return $this->render('project/new.html.twig', [
-            'project' => $project,
-            'form' => $form->createView(),
-        ]);
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($project);
+        $em->flush();
+
+        return $this->forward('App\Controller\ProjectController::index');
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Task;
+use App\Entity\Project;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
@@ -47,4 +48,48 @@ class TaskRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    /**
+     * @return Task[] Returns an array of Task objects
+     */
+    public function what($what, $user = null)
+    {
+
+        $em = $this->getEntityManager();
+
+        
+        switch ($what) {
+            case 'attachedToMe':
+                return $this->createQueryBuilder('t')
+                    ->andWhere('t.attachedTo = :val')
+                    ->setParameter('val', $user)
+                    ->orderBy('t.date', 'ASC')
+                    ->getQuery()
+                    ->getResult();
+                break;
+                
+            case 'related':
+                $projects = $em->createQueryBuilder()->select('p')
+                    ->from('App\Entity\Project', 'p')
+                    ->where('p.user = :val')
+                    ->setParameter('val', $user)
+                    ->getQuery()
+                    ->getResult();
+
+                // dump($projects);die;
+                return  $this->createQueryBuilder('t')
+                    ->andWhere('t.project in (:val)')
+                    ->setParameter('val', $projects)
+                    ->orderBy('t.date', 'ASC')
+                    ->getQuery()
+                    ->getResult();
+                // dump($tasks);die;
+            break;
+            
+            default:
+                return $this->findAll();
+                break;
+        }
+
+    }
 }

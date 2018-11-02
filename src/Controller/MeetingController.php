@@ -10,40 +10,50 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+use App\Service\MakeJson;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Validator\Constraints\DateTime;
+
 /**
  * @Route("/meeting")
  */
 class MeetingController extends AbstractController
 {
     /**
-     * @Route("/", name="meeting_index", methods="GET")
+     * @Route("/{what}/{user}", name="meeting_index", methods="GET",
+     * defaults={"what": "all", "user": null})
      */
-    public function index(MeetingRepository $meetingRepository): Response
+    public function index(MeetingRepository $meetingRepository, MakeJson $makeJson, $what, $user): Response
     {
-        return $this->render('meeting/index.html.twig', ['meetings' => $meetingRepository->findAll()]);
+        return $makeJson->json($meetingRepository->what($what, $user), array('project'));
     }
 
     /**
-     * @Route("/new", name="meeting_new", methods="GET|POST")
+     * @Route("/", name="meeting_new", methods="POST")
      */
-    public function new(Request $request): Response
+    public function new(Request $request, ValidatorInterface $validator): Response
     {
+        $body = json_decode($request->getContent(), true);
         $meeting = new Meeting();
         $form = $this->createForm(MeetingType::class, $meeting);
-        $form->handleRequest($request);
+        $form->submit($body);
+        $meeting->setDate(new \DateTime($body['date']));
+        // dump($meeting);die;
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($meeting);
-            $em->flush();
-
-            return $this->redirectToRoute('meeting_index');
+        $errors = $validator->validate($meeting);
+        if (count($errors) > 0) {
+            return $makeJson->json($errors);
+            $errorsString = (string) $errors;
+            // return new JsonResponse($errors);
         }
 
-        return $this->render('meeting/new.html.twig', [
-            'meeting' => $meeting,
-            'form' => $form->createView(),
-        ]);
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($meeting);
+        $em->flush();
+
+        return $this->forward('App\Controller\MeetingController::index', array("what"=> "all", "user" => null));
+        
     }
 
     /**
@@ -51,7 +61,7 @@ class MeetingController extends AbstractController
      */
     public function show(Meeting $meeting): Response
     {
-        return $this->render('meeting/show.html.twig', ['meeting' => $meeting]);
+        return $makeJson->json($meeting, array('project'));
     }
 
     /**

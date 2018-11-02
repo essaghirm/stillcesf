@@ -29,7 +29,12 @@ class Project
     /**
      * @ORM\Column(type="string", length=10)
      */
-    private $phases;
+    private $phase;
+
+    /**
+     * @ORM\Column(type="text")
+     */
+    private $services;
 
     /**
      * @ORM\Column(type="string", length=50)
@@ -81,14 +86,14 @@ class Project
         return $this;
     }
 
-    public function getPhases(): ?string
+    public function getPhase(): ?string
     {
-        return $this->phases;
+        return $this->phase;
     }
 
-    public function setPhases(string $phases): self
+    public function setPhase(string $phase): self
     {
-        $this->phases = $phases;
+        $this->phase = $phase;
 
         return $this;
     }
@@ -137,6 +142,18 @@ class Project
     public function setUser(?user $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getServices(): ?string
+    {
+        return $this->services;
+    }
+
+    public function setServices(string $services): self
+    {
+        $this->services = $services;
 
         return $this;
     }
